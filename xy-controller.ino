@@ -1,5 +1,5 @@
 #include <Adafruit_HX8357.h>
-#include <Adafruit_TouchScreen.h>
+#include <TouchScreen.h>
 #include <WiFi.h>
 #define SerialMon Serial
 #include <AppleMIDI_Debug.h>
@@ -25,11 +25,12 @@ const int DEBOUNCE_DELAY = 70; // the debounce time; increase if the output flic
 Adafruit_HX8357 tft = Adafruit_HX8357(TFT_CS, TFT_DC, TFT_RST);
 
 // Initialize the touchscreen
-Adafruit_TouchScreen ts = Adafruit_TouchScreen(XP, YP, XM, YM, 300);
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
 // global variables to keep track of the previous position
 int previous_x = -1;
 int previous_y = -1;
+int8_t isConnected = 0;
 
 APPLEMIDI_CREATE_DEFAULTSESSION_INSTANCE();
 
@@ -42,7 +43,7 @@ void setup()
   Serial.println();
 
   Serial.print("working2");
-  1 WiFi.begin(ssid, pass);
+  WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
@@ -66,12 +67,12 @@ void setup()
 
   AppleMIDI.setHandleConnected([](const APPLEMIDI_NAMESPACE::ssrc_t &ssrc, const char *name)
                                {
-        isConnected++;
-        DBG(F("Connected to session"), ssrc, name); });
+    isConnected++;
+    DBG(F("Connected to session"), ssrc, name); });
   AppleMIDI.setHandleDisconnected([](const APPLEMIDI_NAMESPACE::ssrc_t &ssrc)
                                   {
-        isConnected--;
-        DBG(F("Disconnected"), ssrc); });
+    isConnected--;
+    DBG(F("Disconnected"), ssrc); });
 }
 
 void loop()
